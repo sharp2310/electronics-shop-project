@@ -4,13 +4,13 @@ from src.item import Item
 
 
 def test_calculate_total_price():
-    obj1 = Item('помидорка', 15.0, 20)
-    assert obj1.calculate_total_price() == 300
+    obj1 = Item('Телевизор', 50000.0, 10)
+    assert obj1.calculate_total_price() == 500000.0
 
-    obj2 = Item('луковичок', 20.0, 1)
+    obj2 = Item('Холодильник', 40000.0, 5)
     Item.pay_rate = 0.8
     obj2.apply_discount()
-    assert obj2.calculate_total_price() == 16.0
+    assert obj2.calculate_total_price() == 160000.0
 
     obj3 = Item("Смартфон", 10000, 20)
     obj4 = Item("Ноутбук", 20000, 5)
