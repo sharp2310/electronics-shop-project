@@ -27,7 +27,7 @@ def test_instantiate_from_csv():
     item1 = Item.all[0]
     assert item1.name == 'Смартфон'
 
-    item2.name = 'Телефон'
+    item1.name = 'Телефон'
     assert item2.name == 'Телефон'
 
     item1.name = 'СуперСмартфон'
@@ -38,3 +38,11 @@ def test_string_to_number():
     assert Item.string_to_number('5') == 5
     assert Item.string_to_number('5.0') == 5
     assert Item.string_to_number('5.5') == 5
+
+
+def test_name():
+    item1.name = 'Телефон'
+    assert item1.name == 'Телефон'
+
+    item2.name = 'СуперСмартфон'
+    assert item2.name == 'СуперСмарт'
