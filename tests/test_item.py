@@ -56,3 +56,36 @@ def test_repr():
 def test_str():
     item1 = Item("Смартфон", 10000, 20)
     assert str(item1) == 'Смартфон'
+
+
+phone1 = Phone("iPhone 14", 120_000, 5, 2)
+item2 = Item("Смартфон", 10000, 20)
+
+
+def test_add():
+    assert item2 + phone1 == 25
+    assert phone1 + phone1 == 10
+
+
+def test_number_of_sim():
+    phone1.number_of_sim = 5
+    assert phone1.number_of_sim == 5
+
+
+def test_exc_number_of_sim():
+    phone1.number_of_sim = 0
+    assert phone1.number_of_sim() == 0
+
+
+def test_file_not_found():
+    with pytest.raises(FileNotFoundError):
+        Item.instantiate_from_csv("item.csv")
+
+
+def test_instantiate_csv_error():
+    """
+    Тест будет работать только в том случае, если добавить файл
+    в котором будут не соответствовать данные для метода
+    """
+    with pytest.raises(InstantiateCSVError):
+        Item.instantiate_from_csv("item.csv")
