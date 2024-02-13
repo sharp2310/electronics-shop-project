@@ -1,36 +1,30 @@
-from src.item import Item
+﻿from src.item import Item
 
 
-class Language:
-    def __init__(self, language: str = "EN") -> None:
-        """ Инициализация атрибута класса """
-        self.__language = language
+class Mixin:
 
-    @property
-    def language(self) -> str:
-        """ Возвращает язык раскладки клавиатуры """
-        return self.__language
+    def __init__(self):
+        self._language = None
 
-    def change_lang(self) -> 'Language':
-        """ Меняет язык раскладки """
+    def install_lang(self):
+        self._language = 'EN'
 
-        if self.__language == "EN":
-            self.__language = "RU"
-        else:
-            self.__language = "EN"
-        return self
+    def change_lang(self) -> None:
+        if self._language == 'EN':
+            self._language = 'RU'
+        elif self._language == 'RU':
+            self._language = 'EN'
 
 
-class Keyboard(Item, Language):
-    """ Класс для представления клавиатуры в магазине. """
+class Keyboard(Item, Mixin):
 
-    def __init__(self, name: str, price: float, quantity: int) -> None:
-        """ Инициализация атрибутов класса """
+    def __init__(self, name: str, price: float, quantity: int):
         super().__init__(name, price, quantity)
-        Language.__init__(self)
+        Mixin.install_lang(self)
 
     def __repr__(self):
-        """
-        Возвращает информацию об объекте
-        """
-        return f"Keyboard({self.name}, {self.price}, {self.quantity}, {self.__language})"
+        return f"Keyboard({self.name}, {self.price}, {self.quantity}, {self._language})"
+
+    @property
+    def language(self):
+        return self._language

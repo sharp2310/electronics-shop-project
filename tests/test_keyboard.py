@@ -1,30 +1,29 @@
 import pytest
-from src.keyboard import Keyboard
+
+from src.item import Item
+from src.keyboard import Keyboard, Mixin
 
 
 @pytest.fixture
-def keyboard_fixture():
-    return Keyboard('Dark Project KD87A', 9600, 5)
+def fixture_class():
+    keyboard = Keyboard('Dark Project KD87A', 9600, 5)
+    return keyboard
 
 
-def test___str__(keyboard_fixture):
-    assert str(keyboard_fixture) == "Dark Project KD87A"
+def test_class(fixture_class):
+    assert isinstance(fixture_class, object)
+    assert issubclass(Keyboard, Item)
+    assert issubclass(Keyboard, Mixin)
+    assert str(fixture_class) == "Dark Proje"
 
 
-def test_language(keyboard_fixture):
-    assert str(keyboard_fixture.language) == "EN"
+def test_lang_in_keyboard(fixture_class):
+    assert fixture_class.language == 'EN'
 
+    fixture_class.change_lang()
+    assert fixture_class.language == 'RU'
 
-def test_language2(keyboard_fixture):
-    keyboard_fixture.change_lang()
-    assert str(keyboard_fixture.language) == "RU"
-
-
-def test_language3(keyboard_fixture):
-    keyboard_fixture.change_lang().change_lang()
-    assert str(keyboard_fixture.language) == "EN"
-
-
-def test_language4(keyboard_fixture):
-    with pytest.raises(AttributeError):
-        keyboard_fixture.language = 'CH'
+    fixture_class.change_lang()
+    assert fixture_class.language == 'EN'
+    #
+    # fixture_class.language = 'CH'

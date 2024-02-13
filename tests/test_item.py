@@ -1,91 +1,109 @@
 """Здесь надо написать тесты с использованием pytest для модуля item."""
-from config import DICT_DIR
+import pathlib
+
+import pytest
+
+from src.InstantiateCSVError import InstantiateCSVError
 from src.item import Item
+from src.phone import Phone
 
 
-def test_calculate_total_price():
-    obj1 = Item('Телевизор', 50000.0, 10)
-    assert obj1.calculate_total_price() == 500000.0
+def test_check_len_item_all_if_len_zero():
+    Item.all.clear()
+    assert len(Item.all) == 0
 
-    obj2 = Item('Холодильник', 40000.0, 5)
-    Item.pay_rate = 0.8
-    obj2.apply_discount()
-    assert obj2.calculate_total_price() == 160000.0
 
-    obj3 = Item("Смартфон", 10000, 20)
-    obj4 = Item("Ноутбук", 20000, 5)
-    Item.pay_rate = 0.8
-    obj3.apply_discount()
-    assert obj3.price == 8_000.0
-    assert obj4.price == 20_000.0
+def test_check_len_item_all_if_len_one():
+    Item.all.clear()
+    item = Item('Телефон', 10000, 5)
+
+    assert len(item.all) == 1
+
+
+def test_init_object_item(fixture_class_item):
+    assert fixture_class_item.name == "Смартфон"
+    assert fixture_class_item.price == 10000
+    assert fixture_class_item.quantity == 20
+
+
+def test_sum_total_price(fixture_class_item, fixture_class_item_2):
+    assert fixture_class_item.calculate_total_price() == 10000 * 20
+    assert fixture_class_item_2.calculate_total_price() == 100 * 666
+
+
+def test_pay_rate(fixture_class_item, fixture_class_item_2):
+    fixture_class_item.pay_rate = 0.5
+    fixture_class_item.apply_discount()
+
+    assert fixture_class_item.price == 10000 * 0.5
+    assert fixture_class_item_2.price == 100
+    assert fixture_class_item.calculate_total_price() == (10000 * 0.5) * 20
+    assert fixture_class_item.pay_rate == 0.5
+
+
+def test_item_all(fixture_class_item, fixture_class_item_2):
+    for value in Item.all:
+        assert isinstance(value, object)
+
+
+def test_getter_and_setter(fixture_class_item):
+    item = fixture_class_item
+    item.name = "smartphoneOne"
+    assert item.name == "smartphone"
+
+    item.name = "smart"
+    assert item.name == "smart"
+
+    item.name = 111
+    assert item.name == "111"
 
 
 def test_instantiate_from_csv():
-    Item.instantiate_from_csv(DICT_DIR)
+    ROOT = pathlib.Path(__file__).parent.parent
+    Item.instantiate_from_csv(pathlib.Path.joinpath(ROOT / 'src/items.csv'))
+
     assert len(Item.all) == 5
 
     item1 = Item.all[0]
     assert item1.name == 'Смартфон'
 
-    item1.name = 'Телефон'
-    assert item2.name == 'Телефон'
-
-    item1.name = 'СуперСмартфон'
-    assert item1.name == 'СуперСмарт'
-
 
 def test_string_to_number():
-    assert Item.string_to_number('5') == 5
-    assert Item.string_to_number('5.0') == 5
-    assert Item.string_to_number('5.5') == 5
+    assert Item.string_to_number('2') == 2
+    assert Item.string_to_number('2.5') == 2
+    assert Item.string_to_number('2,5') == 2
 
 
-def test_name():
-    item1.name = 'Телефон'
-    assert item1.name == 'Телефон'
-
-    item2.name = 'СуперСмартфон'
-    assert item2.name == 'СуперСмарт'
-
-
-def test_repr():
+def test_metods_repr_and_str():
     item1 = Item("Смартфон", 10000, 20)
     assert repr(item1) == "Item('Смартфон', 10000, 20)"
-
-
-def test_str():
-    item1 = Item("Смартфон", 10000, 20)
     assert str(item1) == 'Смартфон'
 
 
-phone1 = Phone("iPhone 14", 120_000, 5, 2)
-item2 = Item("Смартфон", 10000, 20)
+def test_if_phone_is_subclass():
+    phone = Phone("iPhone 14", 120_000, 5, 2)
+
+    assert issubclass(Phone, Item)
+    assert isinstance(phone, object)
 
 
-def test_add():
-    assert item2 + phone1 == 25
-    assert phone1 + phone1 == 10
+def test_add_class():
+    phone = Phone("iPhone 14", 120_000, 5, 2)
+    item = Item("iPhone 14", 120_000, 5)
+
+    assert phone + item == 10
+    with pytest.raises(Exception):
+        (phone + 5)
 
 
-def test_number_of_sim():
-    phone1.number_of_sim = 5
-    assert phone1.number_of_sim == 5
+def test_csv_file_exceptions():
+    ROOT = pathlib.Path(__file__).parent.parent
+    DATA1 = pathlib.Path.joinpath(ROOT / 'src/items2.csv')
+    DATA2 = pathlib.Path.joinpath(ROOT / 'src/items3.csv')
 
-
-def test_exc_number_of_sim():
-    phone1.number_of_sim = 0
-    assert phone1.number_of_sim() == 0
-
-
-def test_file_not_found():
     with pytest.raises(FileNotFoundError):
-        Item.instantiate_from_csv("item.csv")
+        Item.instantiate_from_csv(DATA1)
+        Item.instantiate_from_csv()
 
-
-def test_instantiate_csv_error():
-    """
-    Тест будет работать только в том случае, если добавить файл
-    в котором будут не соответствовать данные для метода
-    """
     with pytest.raises(InstantiateCSVError):
-        Item.instantiate_from_csv("item.csv")
+        Item.instantiate_from_csv(DATA2)
